@@ -82,7 +82,7 @@ function start () {
             type: "list",
             message: "What would you like to do?",
             name: "action",
-            choices: ["View departments", "View roles", "View employees", "Add department", "Add role", "Add employee", "Update employee role", "Update employee manager", "View Department Utilized Budget",  "Exit"]
+            choices: ["View departments", "View roles", "View employees", "Add department", "Add role", "Add employee", "Update employee role", "Update employee manager", "View Department Utilized Budget",  "View employees by manager", "Exit"]
         }
         ]).then(function(answers) {
             switch (answers.action) {
@@ -110,8 +110,11 @@ function start () {
               case "Update employee manager":
                 updateManager()
                 break
-                case "View Department Utilized Budget":
+              case "View Department Utilized Budget":
                   viewTotalSalaries()
+                break
+              case "View employees by manager":
+                  viewEmployeesByManager()
                 break
             case "Exit":
                 connection.end()
@@ -198,9 +201,8 @@ function addDepartment () {
               name: answers.departmentName
           }
       ], function(err, res) {
-//2 - Do i need to do anything with "res" here? or will table update b/c of INSERT INTO
         if (err) throw err;
-        console.log(answers.name + "department successfully added!")
+        console.log(answers.departmentName + " department successfully added!")
         start();
     })
     });
@@ -272,6 +274,7 @@ function addEmployee () {
         }
     ], function(err, res) {
       if (err) throw err;
+      console.log("Employee named " + res[0].first_name + " " + res[0].last_name + "has been successfull added to the database!")
       start();
   })
   });
@@ -372,6 +375,28 @@ function viewTotalSalaries () {
       if (err) throw err;
       for (i=0;  i< res.length; i++ ) 
       console.log("Sum of salary for the " +res[0].Department +" Department is: " + res[0].Total)
+      start();
+  })
+  });
+}
+
+function viewEmployeesByManager () {
+  inquirer.prompt([
+    {
+      name: "manager",
+      type: "input",
+      message: "What manager ID would you like to see the employees by? Need to retrieve this from employees database.",
+    }
+  ]).then(function(answers) {
+    connection.query("SELECT employees.manager_id AS Manager, employees.first_name, employees.last_name, roles.title FROM employees INNER JOIN roles on employees.role_id = roles.id WHERE employees.? GROUP BY employees.manager_id",
+    [
+        {
+            id: answers.manager
+        }
+    ], function(err, res) {
+      if (err) throw err;
+      for (i=0;  i< res.length; i++ ) 
+      console.log("This manager's id is " +res[0].Manager +" , First Name is: " + res[0].first_name)
       start();
   })
   });
