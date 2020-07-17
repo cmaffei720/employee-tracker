@@ -146,16 +146,15 @@ function viewRoles () {
 
 //view department function
 function viewDepartment () {
-    inquirer
-    .prompt({
-      name: "department",
-      type: "list",
-      message: "Which department would you like to search for?",
-      choices: departmentArray
-    })
-    .then(function(answers) {
-      var query = "SELECT * FROM departments WHERE ?";
-      connection.query(query, { name: answers.department }, function(err, res) {
+    // inquirer
+    // .prompt({
+    //   name: "department",
+    //   type: "list",
+    //   message: "Which department would you like to search for?",
+    //   choices: departmentArray
+    // })
+    // .then(function(answers) {
+      connection.query("SELECT * FROM departments", function(err, res) {
         if (err) throw err;
         for (var i = 0; i < res.length; i++) {
 //3 - console.tables(query)?
@@ -163,7 +162,6 @@ function viewDepartment () {
         }
         start();
       });
-    });
 }
 
 
@@ -234,8 +232,8 @@ function addRole () {
             department_id: answers.deptID
         }
     ], function(err, res) {
-//2 - Do i need to do anything with "res" here? or will table update b/c of INSERT INTO
       if (err) throw err;
+      console.log("Success! This role has been successfully added to the database!")
       start();
   })
   });
@@ -274,7 +272,7 @@ function addEmployee () {
         }
     ], function(err, res) {
       if (err) throw err;
-      console.log("Employee named " + res[0].first_name + " " + res[0].last_name + "has been successfull added to the database!")
+      console.log("Employee has been successfull added to the database!")
       start();
   })
   });
